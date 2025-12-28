@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Any, TextIO
 
+from ..applications import render_application_message, send_application
 from ..ai.blackbox import BlackboxChat
 from ..ai.openai import OpenAIChat
 from ..api import ApiClient, BadResponse
@@ -15,13 +16,7 @@ from ..main import Namespace as BaseNamespace
 from ..mixins import GetResumeIdMixin
 from ..telemetry_client import TelemetryClient, TelemetryError
 from ..types import ApiListResponse, VacancyItem
-from ..utils import (
-    fix_datetime,
-    parse_interval,
-    parse_invalid_datetime,
-    random_text,
-    truncate_string,
-)
+from ..utils import fix_datetime, parse_interval, parse_invalid_datetime, truncate_string
 
 logger = logging.getLogger(__package__)
 
@@ -440,9 +435,9 @@ class Operation(BaseOperation, GetResumeIdMixin):
                             logger.error(ex)
                             continue
                     else:
-                        msg = (
-                            random_text(random.choice(self.application_messages))
-                            % message_placeholders
+                        msg = render_application_message(
+                            random.choice(self.application_messages),
+                            message_placeholders,
                         )
 
                     logger.debug(msg)
@@ -462,7 +457,7 @@ class Operation(BaseOperation, GetResumeIdMixin):
                 )
                 time.sleep(interval)
 
-                res = self.api_client.post("/negotiations", params)
+                res = send_application(self.api_client, params)
                 assert res == {}
                 print(
                     "📨 Отправили отклик",
