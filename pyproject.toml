@@ -11,7 +11,7 @@ packages = [{include = "hh_applicant_tool"}]
 python = "^3.10"
 requests = {extras = ["socks"], version = "^2.32.3"}
 prettytable = "^3.6.0"
-pyqt6 = { version = "6.7.0", optional = true }
+pyqt6 = "^6.10.1"
 pyqt6-webengine = { version = "6.7.0", optional = true }
 
 [tool.poetry.extras]
